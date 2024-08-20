@@ -3,7 +3,9 @@ package application.controller;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import application.model.Aluno;
 import application.repository.AlunoRepository;
@@ -35,6 +37,12 @@ public class AlunoController {
 
         @GetMapping("/{id}")
         public Aluno details(@PathVariable long id){
+            Optional<Aluno> resultado = alunoRepo.findById(id);
+            if (resultado.isEmpty()) {
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,"Aluno não encontrado"
+                );
+            }
             return alunoRepo.findById(id).get();
         }
 
@@ -44,6 +52,16 @@ public class AlunoController {
             @RequestBody Aluno novosDados){
 
             Optional<Aluno> resultado =  alunoRepo.findById(id);
+            if (resultado.isEmpty()) {
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,"Aluno não encontrado"
+                );
+            }
+            if(novosDados.getNome().isEmpty()){
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,"Nome do aluno Invalido"
+                );
+            }
 
             resultado.get().setNome(novosDados.getNome());
 
@@ -52,6 +70,11 @@ public class AlunoController {
 
         @DeleteMapping("/{id}")
         public void delete(@PathVariable long id){
+            if(!alunoRepo.existsById(id)){
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,"Aluno não encontrado"
+                );
+            }
             alunoRepo.deleteById(id);
         }
     

@@ -3,7 +3,9 @@ package application.controller;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import application.model.Aluno;
 import application.repository.AlunoRepository;
@@ -35,6 +37,12 @@ public class AlunoController {
 
         @GetMapping("/{id}")
         public Aluno details(@PathVariable long id){
+            Optional<Aluno> resultado = alunoRepo.findById(id);
+            if (resultado.isEmpty()) {
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,"Aluno não encontrado"
+                );
+            }
             return alunoRepo.findById(id).get();
         }
 
@@ -44,6 +52,11 @@ public class AlunoController {
             @RequestBody Aluno novosDados){
 
             Optional<Aluno> resultado =  alunoRepo.findById(id);
+            if (resultado.isEmpty()) {
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,"Aluno não encontrado"
+                );
+            }
 
             resultado.get().setNome(novosDados.getNome());
 

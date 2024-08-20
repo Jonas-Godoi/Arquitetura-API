@@ -57,6 +57,11 @@ public class AlunoController {
                     HttpStatus.NOT_FOUND,"Aluno não encontrado"
                 );
             }
+            if(novosDados.getNome().isEmpty()){
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,"Nome do aluno Invalido"
+                );
+            }
 
             resultado.get().setNome(novosDados.getNome());
 
@@ -65,6 +70,11 @@ public class AlunoController {
 
         @DeleteMapping("/{id}")
         public void delete(@PathVariable long id){
+            if(!alunoRepo.existsById(id)){
+                throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,"Aluno não encontrado"
+                );
+            }
             alunoRepo.deleteById(id);
         }
     
